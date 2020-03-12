@@ -242,7 +242,7 @@ const mapStateToProps = state => ({
 
 WordsListContainer.propTypes = {
     fetchItems: PropTypes.func,
-    words: PropTypes.object,
+    words: PropTypes.array,
     showModal: PropTypes.func,
     hideModal: PropTypes.func,
     saveItem: PropTypes.func,
