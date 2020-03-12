@@ -4,7 +4,7 @@ Learn English is an application is used to note the words learned on the duoling
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+Run the command below to start my application
 
 ```bash
 npm install
@@ -15,4 +15,4 @@ npm install
 * **Nguyen Quang Tuyen**
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+This project is licensed under the MIT License
