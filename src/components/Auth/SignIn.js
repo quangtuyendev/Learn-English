@@ -1,17 +1,33 @@
 import _ from 'lodash';
 import md5 from 'md5';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import { Button, Col, Container, Form, Input, Label, Row } from 'reactstrap';
 import * as actions from '../../actions/index';
+import { getUsers } from '../../api/users';
 
 
-const SignIn = ({ users, signin }) => {
-
+const SignIn = ({ signin }) => {
+    const textInput = useRef(null);
     const history = useHistory();
     const [userInfo, setUserInfo] = useState({});
+    const [users, setUsers] = useState([]);
+
+    // fetch users
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await getUsers();
+                setUsers(res.data);
+            } catch (error) {
+                console.log(error);
+            };
+        };
+        fetchData();
+    }, []);
+
     const handleChange = event => {
         const { name, value } = event.target;
         setUserInfo({
@@ -19,6 +35,7 @@ const SignIn = ({ users, signin }) => {
             [name]: value
         });
     };
+
 
     const { email, password } = userInfo;
     let error = {
@@ -60,6 +77,10 @@ const SignIn = ({ users, signin }) => {
         };
     };
 
+    useEffect(() => {
+        textInput.current.focus();
+    }, []);
+
     return (
         <Container className="container mt-5">
             <Row className="row mt-5">
@@ -67,13 +88,14 @@ const SignIn = ({ users, signin }) => {
                     <Form onSubmit={onSubmit} className="form-auth">
                         <div className="form-group">
                             <Label htmlFor="email">Your mail*</Label>
-                            <Input
+                            <input
                                 onChange={handleChange}
                                 name="email" type="email"
                                 className="form-control"
                                 id="email"
                                 placeholder="Enter your mail"
                                 autoComplete="off"
+                                ref={textInput}
                             />
                             {email !== undefined && errEmail && <span className="text-danger">{errEmail}</span>}
                         </div>
@@ -99,7 +121,6 @@ const SignIn = ({ users, signin }) => {
 };
 
 SignIn.propTypes = {
-    users: PropTypes.array,
     signin: PropTypes.func
 };
 

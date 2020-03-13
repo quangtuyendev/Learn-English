@@ -9,6 +9,7 @@ module.exports = {
     },
     rules: {
       semi: 1,
+      qoutes: ['single', 1]
     },
     env: {
       es6: true,

@@ -10,7 +10,11 @@ export const editReducer = (state = INITIAL_STATE, action) => {
                 ...action.payload
             };
         case types.CLEAR_ITEM_EDIT:
-            return {};
+            return {
+                name: undefined,
+                image: undefined,
+                date: null
+            };
         default:
             return state;
     };

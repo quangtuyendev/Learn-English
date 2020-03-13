@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import md5 from 'md5';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useHistory } from "react-router-dom";
 import {
@@ -14,8 +14,10 @@ import * as types from '../../constants/index';
 
 
 const SignUp = ({ users }) => {
+    const textInput = useRef(null);
     const history = useHistory();
     const [userInfo, setUserInfo] = useState({});
+    
     const handleChange = event => {
         const { name, value } = event.target;
         setUserInfo({
@@ -23,7 +25,7 @@ const SignUp = ({ users }) => {
             [name]: value
         });
     };
-
+    
     const { email, password, cfpassword } = userInfo;
     const userCurrent = _.find(users, user => user.email === email);
     const { email: userEmail } = userCurrent ? userCurrent : {};
@@ -74,6 +76,10 @@ const SignUp = ({ users }) => {
         };
     };
 
+    useEffect(() => {
+        textInput.current.focus();
+    }, []);
+
     const { errEmail, errPassword, errCfPassword } = errors;
     return (
         <Container className="container mt-5">
@@ -82,7 +88,7 @@ const SignUp = ({ users }) => {
                     <Form className="form-auth">
                         <div className="form-group">
                             <Label htmlFor="email">Email address*</Label>
-                            <Input
+                            <input
                                 onChange={handleChange}
                                 name="email"
                                 type="email"
@@ -90,6 +96,7 @@ const SignUp = ({ users }) => {
                                 id="email"
                                 placeholder="Enter your email"
                                 autoComplete="off"
+                                ref={textInput}
                             />
                             {email !== undefined && errEmail && <span className="text-danger">{errEmail}</span>}
                         </div>

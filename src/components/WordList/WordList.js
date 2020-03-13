@@ -12,10 +12,10 @@ export const WordsList = ({ props, children }) => {
                         <table>
                             <thead>
                                 <tr>
-                                    <th><h4 className="table__heading">Words</h4></th>
-                                    <th><h4 className="table__heading">Pronounce</h4></th>
-                                    <th><h4 className="table__heading">Last practice</h4></th>
-                                    <th><h4 className="table__heading">Actions</h4></th>
+                                    <th><h4 className="table-heading">Words</h4></th>
+                                    <th><h4 className="table-heading">Pronounce and view</h4></th>
+                                    <th><h4 className="table-heading">Last practice</h4></th>
+                                    <th><h4 className="table-heading">Actions</h4></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -31,5 +31,5 @@ export const WordsList = ({ props, children }) => {
 
 WordsList.propTypes = {
     props: PropTypes.object,
-    children: PropTypes.object
+    children: PropTypes.array
 };

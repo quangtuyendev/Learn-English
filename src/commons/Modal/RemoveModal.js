@@ -1,9 +1,19 @@
 import React from 'react';
-import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 export const RemoveModal = ({ hideModal, handleDelete, name, id, modalTitle }) => {
+    const onKeyUp = event => {
+        if (event.keyCode === 13) {
+            handleDelete(id);
+        };
+    };
     return (
-        <Modal isOpen={true} toggle={hideModal}>
+        <Modal
+            onKeyUp={onKeyUp}
+            tabIndex="0"
+            isOpen={true}
+            style={{outline: 'none'}}
+            toggle={hideModal}>
             <ModalHeader style={{ padding: '1.4rem 2rem' }} toggle={hideModal}>
                 {modalTitle}
             </ModalHeader>

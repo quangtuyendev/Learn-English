@@ -77,8 +77,7 @@ export const WordHeader = ({ props }) => {
                     </div>
                 </Col>
                 <Col sm="4">
-                    <Input
-                        style={{ fontSize: "1.4rem", padding: "2rem" }}
+                    <Input className="search-input"
                         placeholder="Search something..."
                         name="search"
                         onChange={handleSearch}

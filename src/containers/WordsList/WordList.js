@@ -10,6 +10,7 @@ import WordItem from '../../components/WordItem/WordItem';
 import { WordsList } from '../../components/WordList/WordList';
 import SaveForm from '../../components/Forms/SaveForm';
 import { RemoveModal } from '../../commons/Modal/RemoveModal';
+import { QuickView } from '../../commons/Modal/QuickView';
 
 
 const WordsListContainer = props => {
@@ -83,7 +84,7 @@ const WordsListContainer = props => {
     };
 
     const renderWords = () => {
-        if (!words.length) {
+        if (!words.length && searchValue) {
             return (
                 <tr className="table-nothing">
                     <td>
@@ -100,11 +101,13 @@ const WordsListContainer = props => {
                         word={word}
                         handleEditItem={handleEditItem}
                         showDeleteModal={showDeleteModal}
+                        handleViewImage={handleViewImage}
                     />
                 ))
             );
         }
     };
+
     // handle for save item
     const handleSave = value => {
         const { id } = value;
@@ -115,7 +118,7 @@ const WordsListContainer = props => {
                 setTimeout(() => {
                     hideLoading();
                 }, 1000);
-                toast.success("App Success !", {
+                toast.success("Add Success !", {
                     position: toast.POSITION.BOTTOM_LEFT,
                     autoClose: 2000,
                     bodyClassName: css({
@@ -143,7 +146,6 @@ const WordsListContainer = props => {
             });
         }
     };
-
 
     // handle show modal to add item
     const showAddModal = () => {
@@ -186,7 +188,7 @@ const WordsListContainer = props => {
                 setTimeout(() => {
                     hideLoading();
                 }, 1000);
-                toast.error(`Remove ${name} Success!`, {
+                toast.error(`${name} successfully deleted!`, {
                     position: toast.POSITION.BOTTOM_LEFT,
                     autoClose: 2000,
                     bodyClassName: css({
@@ -202,6 +204,17 @@ const WordsListContainer = props => {
                 handleDelete={handleDelete}
                 hideModal={hideModal}
                 modalTitle="Remove item"
+            />
+        );
+        showModal(modalContent);
+    };
+
+    // handle view image 
+    const handleViewImage = image => {
+        const modalContent = (
+            <QuickView
+                image={image}
+                hideModal={hideModal}
             />
         );
         showModal(modalContent);

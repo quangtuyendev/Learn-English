@@ -3,30 +3,38 @@ import PropTypes from 'prop-types';
 import Moment from 'react-moment';
 import { GOOGLE_TRANSLATE_URL } from '../../constants';
 
-const WordItem = ({ word, handleEditItem, showDeleteModal }) => {
-    const { name, date } = word;
+const WordItem = ({ word, handleEditItem, showDeleteModal, handleViewImage }) => {
+    let { name, image, date } = word;
     return (
         <Fragment>
             <tr>
                 <td>
-                    <a href="/" className="table__text">{name}</a>
+                    <a rel="noopener noreferrer" href={`${GOOGLE_TRANSLATE_URL}${name.toLowerCase()}`} className="table-text" target="_blank">{name.toLowerCase()}</a>
                 </td>
                 <td>
-                    <a href={`${GOOGLE_TRANSLATE_URL}${name}`} className="table__text">
-                        <span type="button" data-toggle="tooltip" data-placement="top" title="Click to listen">
+                    <div className="action-box">
+                        <a rel="noopener noreferrer" href={`${GOOGLE_TRANSLATE_URL}${name.toLowerCase()}`} type="button" data-toggle="tooltip" data-placement="top" title="Click to listen" target="_blank">
                             <i className="fas fa-headphones-alt"></i>
+                        </a>
+                        <span type="button" data-toggle="tooltip" data-placement="top" title="Click to view">
+                            <i
+                                onClick={() => handleViewImage(image)}
+                                className="far fa-image"></i>
                         </span>
-                    </a>
+                    </div>
                 </td>
                 <td>
-                    <span className="table__text">
+                    <span className="table-text">
                         <Moment fromNow>{date}</Moment>
                     </span>
                 </td>
                 <td>
                     <div className="btn btn-group">
                         <button
-                            onClick={() => handleEditItem(word)}
+                            onClick={() => handleEditItem({
+                                ...word,
+                                name: name.toLowerCase()
+                            })}
                             className="btn btn-warning"
                             type="button"
                             data-toggle="tooltip"

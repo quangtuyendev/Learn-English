@@ -21,10 +21,9 @@ export const App = () => {
             try {
                 const res = await getUsers();
                 setUsers(res.data);
-                console.log(res.data);
             } catch (error) {
                 console.log(error);
-            }
+            };
         };
         fetchData();
     }, []);
@@ -41,7 +40,7 @@ export const App = () => {
             </Route>
         ))
     );
-
+    
     return (
         <Router>
             <Switch>
