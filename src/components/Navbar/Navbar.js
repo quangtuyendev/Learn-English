@@ -32,9 +32,6 @@ const Navbar = ({ auth, signout }) => {
                     <li className="nav-item">
                         <Link className="nav-link" to="/signup">Signup</Link>
                     </li>
-                    <li className="nav-item">
-                        <Link className="nav-link" to="/">Home</Link>
-                    </li>
                 </Fragment>
             );
         }
