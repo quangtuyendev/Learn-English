@@ -1,4 +1,4 @@
-export const URL = 'http://5e6753ea1937020016fed960.mockapi.io/api';
+export const URL = 'http://5e6753ea1937020016fed960.mockapi.io';
 
 export const AUTH_USER = 'AUTH_USER';
 
