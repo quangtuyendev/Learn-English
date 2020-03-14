@@ -2,7 +2,9 @@ import axios from 'axios';
 
 class axiosService {
     constructor() {
-        this.instance = axios.create();
+        this.instance = axios.create({
+            baseURL: 'http://5e6753ea1937020016fed960.mockapi.io'
+        });
         // Add a response interceptor
         axios.interceptors.response.use(res => {
             // Any status code that lie within the range of 2xx cause this function to trigger
