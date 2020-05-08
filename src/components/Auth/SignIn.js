@@ -1,127 +1,141 @@
-import _ from 'lodash';
+import { Field, Form, Formik } from 'formik';
 import md5 from 'md5';
-import PropTypes from 'prop-types';
-import React, { useState, useRef, useEffect } from 'react';
-import { connect } from 'react-redux';
+import React, { useContext, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { Button, Col, Container, Form, Input, Label, Row } from 'reactstrap';
-import * as actions from '../../actions/index';
-import { getUsers } from '../../api/users';
+import { Button, Col, Container, Label, Row } from 'reactstrap';
+import { AuthContext } from '../../contexts/auth';
+import { UserContext } from '../../contexts/user';
+import * as utils from '../../utils';
 
+import { signIn } from '../../actions';
 
-const SignIn = ({ signin }) => {
-    const textInput = useRef(null);
-    const history = useHistory();
-    const [userInfo, setUserInfo] = useState({});
-    const [users, setUsers] = useState([]);
+export default function SignIn() {
+  const [showPassword, setShowpassword] = useState(false);
+  const history = useHistory();
+  const [users] = useContext(UserContext);
+  const [, dispatch] = useContext(AuthContext);
 
-    // fetch users
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await getUsers();
-                setUsers(res.data);
-            } catch (error) {
-                console.log(error);
-            };
-        };
-        fetchData();
-    }, []);
+  // validate signin
+  const validation = ({ email, password }) => {
+    const errors = {};
+    const userCurrent = utils.findUser(users, email);
+    const { email: userEmail, password: userPassword } = userCurrent;
 
-    const handleChange = event => {
-        const { name, value } = event.target;
-        setUserInfo({
-            ...userInfo,
-            [name]: value
-        });
-    };
+    if (!email) {
+      errors.email = 'Email is required';
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email)) {
+      errors.email = 'Invalid email address';
+    } else if (!userEmail) {
+      errors.email = 'Email does not exist';
+    }
+    if (!password) {
+      errors.password = 'Password is required';
+    } else if (password.length < 6) {
+      errors.password = 'Password must be at least 6 characters';
+    } else if (!errors.email && userPassword !== md5(password)) {
+      errors.password = 'Wrong password';
+    }
+    return errors;
+  };
 
-
-    const { email, password } = userInfo;
-    let error = {
-        errEmail: null,
-        errPassword: null
-    };
-
-    // validate signin
-    const userCurrent = _.find(users, user => user.email === email);
-    const { email: userEmail, password: userPassword } = userCurrent ? userCurrent : {};
-    if (email !== undefined || password !== undefined) {
-        if (!email) {
-            error.errEmail = 'Email is requied!';
-        } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email)) {
-            error.errEmail = 'Email address invalid!';
-        } else if (!userEmail) {
-            error.errEmail = 'Email does not exist!';
-        } else {
-            error.errEmail = false;
-        }
-        if (!password) {
-            error.errPassword = 'Password is required!';
-        } else if (password.length < 6) {
-            error.errPassword = 'Password need minimum is 6 character!';
-        } else if (md5(password) !== userPassword) {
-            error.errPassword = 'Wrong password!';
-        } else {
-            error.errPassword = false;
-        };
-    };
-
-    const { errEmail, errPassword } = error;
-    const onSubmit = event => {
-        event.preventDefault();
-        if (errEmail === false && errPassword === false) {
-            signin({ email, isAuthenticated: true }, () => {
-                history.push('/');
-            });
-        };
-    };
-
-    useEffect(() => {
-        textInput.current.focus();
-    }, []);
-
-    return (
-        <Container className="container mt-5">
-            <Row className="row mt-5">
-                <Col className="col-sm-5 mx-auto">
-                    <Form onSubmit={onSubmit} className="form-auth">
-                        <div className="form-group">
-                            <Label htmlFor="email">Your mail*</Label>
-                            <input
-                                onChange={handleChange}
-                                name="email" type="email"
-                                className="form-control"
-                                id="email"
-                                placeholder="Enter your mail"
-                                autoComplete="off"
-                                ref={textInput}
-                            />
-                            {email !== undefined && errEmail && <span className="text-danger">{errEmail}</span>}
-                        </div>
-                        <div className="form-group">
-                            <Label htmlFor="password">Your password*</Label>
-                            <Input
-                                onChange={handleChange}
-                                name="password" type="password"
-                                className="form-control"
-                                id="password"
-                                placeholder="Enter your password"
-                                autoComplete="off"
-                            />
-                            {password !== undefined && errPassword && <span className="text-danger">{errPassword}</span>}
-                        </div>
-                        <Link to="/signup"><u className="form-text">Register account here!</u></Link>
-                        <Button type="submit" color="primary" className="d-block" disabled={errEmail !== false || errPassword !== false}>Signin</Button>
-                    </Form>
-                </Col>
-            </Row>
-        </Container>
+  const handleSubmit = ({ email }) => {
+    dispatch(
+      signIn({ email, isAuthenticated: true }, () => {
+        history.push('/');
+        localStorage.setItem(
+          'currentUser',
+          JSON.stringify({ email, isAuthenticated: true })
+        );
+      })
     );
-};
+  };
 
-SignIn.propTypes = {
-    signin: PropTypes.func
-};
-
-export default connect(null, actions)(SignIn);
+  return (
+    <Container className="container mt-5">
+      <Row className="row mt-5">
+        <Col className="col-sm-5 mx-auto">
+          <Formik
+            initialValues={{
+              email: '',
+              password: '',
+            }}
+            onSubmit={handleSubmit}
+            validate={validation}
+          >
+            {({ touched, errors, isValid }) => (
+              <Form className="form-auth" autoComplete="off">
+                <div className="form-group">
+                  <Label htmlFor="email">Your email*</Label>
+                  <Field name="email">
+                    {({ field }) => (
+                      <input
+                        id="email"
+                        type="email"
+                        className="form-control"
+                        placeholder="Enter your email"
+                        {...field}
+                      />
+                    )}
+                  </Field>
+                  {touched.email && errors.email && (
+                    <span
+                      style={{
+                        fontSize: '1.4rem',
+                        marginTop: '0.8rem',
+                        display: 'block',
+                      }}
+                      className="text-danger"
+                    >
+                      {errors.email}
+                    </span>
+                  )}
+                </div>
+                <div className="form-group">
+                  <Label htmlFor="password">Your password*</Label>
+                  <Field name="password">
+                    {({ field }) => (
+                      <input
+                        id="password"
+                        type={`${showPassword ? 'text' : 'password'}`}
+                        className="form-control"
+                        placeholder="Enter your password"
+                        {...field}
+                      />
+                    )}
+                  </Field>
+                  <i
+                    onClick={() => setShowpassword(!showPassword)}
+                    className="far fa-eye"
+                  />
+                  {touched.password && errors.password && (
+                    <span
+                      style={{
+                        fontSize: '1.4rem',
+                        marginTop: '0.8rem',
+                        display: 'block',
+                      }}
+                      className="text-danger"
+                    >
+                      {errors.password}
+                    </span>
+                  )}
+                </div>
+                <Link to="/signup">
+                  <u className="form-text">Register account here</u>
+                </Link>
+                <Button
+                  type="submit"
+                  color="primary"
+                  className="d-block"
+                  disabled={!isValid}
+                >
+                  Signin
+                </Button>
+              </Form>
+            )}
+          </Formik>
+        </Col>
+      </Row>
+    </Container>
+  );
+}

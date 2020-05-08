@@ -1,12 +1,7 @@
-import { connect } from "react-redux";
+import { useContext } from 'react';
+import { ModalContext } from '../../contexts/modal';
 
-const ModalForm = ({ modal }) => {
-    const { isShow, modalContent } = modal;
-    return isShow && modalContent;
-};
-
-const mapStateToProps = state => ({
-    modal: state.modal
-});
-
-export default connect(mapStateToProps)(ModalForm);
+export default function ModalForm() {
+  const [{ isOpen, component }] = useContext(ModalContext);
+  return isOpen ? component : null;
+}

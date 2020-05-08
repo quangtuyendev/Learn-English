@@ -1,133 +1,105 @@
-import * as types from '../constants/index';
-import { getItems, putItem, postItem, deleteItem } from '../api/words';
+import * as types from './types';
 
-// Authentication
-export const signin = ({ email, isAuthenticated }, callback) => {
-    localStorage.setItem('currentUser', JSON.stringify({ email, isAuthenticated }));
-    callback();
-    return {
-        type: types.AUTH_USER,
-        payload: {
-            email,
-            isAuthenticated
-        }
-    };
+export const fetchUserRequest = (users) => ({
+  type: types.FETCH_USERS,
+  payload: users,
+});
+
+export const signOut = () => ({
+  type: types.SIGN_OUT,
+});
+
+export const signIn = (userInfo, callback) => {
+  callback();
+  return {
+    type: types.AUTH_USER,
+    payload: userInfo,
+  };
 };
 
-export const signout = () => {
-    localStorage.removeItem('currentUser');
-    return {
-        type: types.AUTH_USER,
-        payload: {}
-    };
-};
+export const signUp = (userInfo) => ({
+  type: types.SIGN_UP,
+  payload: userInfo,
+});
 
-// Handle words
-export const fetchItems = callback => async distpatch => {
-    try {
-        const res = await getItems();
-        distpatch({
-            type: types.FETCH_ITEMS,
-            payload: res.data
-        });
-        callback();
-    } catch (error) {
-        distpatch({
-            type: types.FETCH_ITEMS_ERROR,
-            payload: 'Fetch Error'
-        });
-    };
-};
-
-export const saveItem = (word, callback) => async distpatch => {
-    try {
-        const res = await postItem(word);
-        distpatch({
-            type: types.SAVE_ITEM,
-            payload: res.data
-        });
-        callback();
-    } catch (error) {
-        distpatch({
-            type: types.SAVE_ITEM_ERROR,
-            payload: 'Save Error'
-        });
-    };
-};
-
-
-export const editItem = (id, word, callback) => async distpatch => {
-    try {
-        const res = await putItem(id, word);
-        distpatch({
-            type: types.SAVE_ITEM,
-            payload: res.data
-        });
-        callback();
-    } catch (error) {
-        distpatch({
-            type: types.SAVE_ITEM_ERROR,
-            payload: 'Save Error'
-        });
-    };
-};
-
-
-export const removeItem = (id, callback) => async dispatch => {
-    try {
-        await deleteItem(id);
-        dispatch({
-            type: types.DELETE_ITEM,
-            payload: id
-        });
-        callback();
-    } catch (error) {
-        dispatch({
-            type: types.DELETE_ITEM_ERROR,
-            payload: 'Delete error'
-        });
-    };
-};
-
-// Handle fetch item to edit
-export const fetchItemEdit = value => ({
-    type: types.FETCH_ITEM_EDIT,
-    payload: value
+export const fetchItemEdit = (item) => ({
+  type: types.FETCH_ITEM_EDIT,
+  payload: item,
 });
 
 export const clearItemEdit = () => ({
-    type: types.CLEAR_ITEM_EDIT
+  type: types.CLEAR_ITEM_EDIT,
 });
 
-// Handle modal
-export const showModal = modalContent => {
-    return {
-        type: types.SHOW_MODAL,
-        payload: modalContent
-    };
+export const fetchWordsRequest = (items) => ({
+  type: types.FETCH_ITEMS,
+  payload: items,
+});
+
+export const saveItem = (item, callback) => {
+  callback();
+  return { type: types.SAVE_ITEM, payload: item };
 };
 
-export const hideModal = () => ({
-    type: types.HIDE_MODAL
-});
+export const deleteItem = (id, callback) => {
+  callback();
+  return {
+    type: types.DELETE_ITEM,
+    payload: id,
+  };
+};
 
-// Handle Loading
 export const showLoading = () => ({
-    type: types.SHOW_LOADING
+  type: types.SHOW_LOADING,
 });
-
 export const hideLoading = () => ({
-    type: types.HIDE_LOADING
+  type: types.HIDE_LOADING,
 });
 
-// Handle search
-export const searchItem = value => ({
-    type: types.SEARCH_ITEM,
-    payload: value
+export const showModal = (component) => ({
+  type: types.SHOW_MODAL,
+  payload: component,
+});
+export const hideModal = () => ({
+  type: types.HIDE_MODAL,
 });
 
-// Handle sort
-export const sortItem = ({ sortBy, sortValue }) => ({
-    type: types.SORT_ITEM,
-    payload: { sortBy, sortValue }
-});
+/* 
+
+export const addItem = (item, callback) => async dispatch => {
+  try {
+    const { data } = await postItem(item);
+    callback();
+    dispatch({ type: types.SAVE_ITEM, payload: data });
+  } catch (error) {
+    console.log('Add item faild');
+  }
+};
+
+
+export const editItem = async (id, item, callback) => {
+  try {
+    await putItem(id, item);
+    callback();
+    return {
+      type: types.SAVE_ITEM,
+      payload: item,
+    };
+  } catch (error) {
+    console.log('Edit item faild');
+  }
+};
+
+export const deleteItem = async (id, callback) => {
+  try {
+    await deleteItemRequest(id);
+    callback();
+    return {
+      type: types.DELETE_ITEM,
+      payload: id,
+    };
+  } catch (error) {
+    console.log('Delete item faild');
+  }
+};
+*/

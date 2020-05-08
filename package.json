@@ -9,6 +9,7 @@
     "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
     "classnames": "^2.2.6",
+    "formik": "^2.1.4",
     "glamor": "^2.20.40",
     "lodash": "^4.17.15",
     "md5": "^2.2.1",
@@ -16,20 +17,29 @@
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-moment": "^0.9.7",
-    "react-redux": "^7.2.0",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
     "react-toastify": "^5.5.0",
     "reactstrap": "^8.4.1",
-    "redux": "^4.0.5",
-    "redux-form": "^8.3.1",
-    "redux-thunk": "^2.3.0"
+    "yup": "^0.28.5"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "pretty-quick --staged",
+      "eslint src/ --fix",
+      "git add"
+    ]
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -49,6 +59,10 @@
   "devDependencies": {
     "eslint-config-airbnb": "^18.0.1",
     "eslint-config-prettier": "^6.10.0",
-    "eslint-plugin-prettier": "^3.1.2"
+    "eslint-plugin-prettier": "^3.1.2",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.2",
+    "prettier": "^2.0.5",
+    "pretty-quick": "^2.0.1"
   }
 }

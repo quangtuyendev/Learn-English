@@ -1,146 +1,196 @@
+import { Field, Form, Formik } from 'formik';
 import _ from 'lodash';
 import md5 from 'md5';
-import React, { useState, useRef, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { Link, useHistory } from "react-router-dom";
-import {
-    Container, Row, Col,
-    Form, Label,
-    Input, Button
-} from 'reactstrap';
-
+import React, { useContext, useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { Button, Col, Container, Label, Row } from 'reactstrap';
+import { signUp } from '../../actions';
+import * as types from '../../actions/types';
 import { postUser } from '../../api/users';
-import * as types from '../../constants/index';
+import { UserContext } from '../../contexts/user';
+import * as utils from '../../utils';
 
+export default function SignUp() {
+  const [showPasswordField, setShowPasswordField] = useState([]);
 
-const SignUp = ({ users }) => {
-    const textInput = useRef(null);
-    const history = useHistory();
-    const [userInfo, setUserInfo] = useState({});
-    
-    const handleChange = event => {
-        const { name, value } = event.target;
-        setUserInfo({
-            ...userInfo,
-            [name]: value
-        });
-    };
-    
-    const { email, password, cfpassword } = userInfo;
-    const userCurrent = _.find(users, user => user.email === email);
-    const { email: userEmail } = userCurrent ? userCurrent : {};
+  const history = useHistory();
+  const [users, dispatch] = useContext(UserContext);
 
-    // validate signup
-    const errors = {
-        errEmail: null,
-        errPassword: null,
-        errCfPassword: null
-    };
+  // validate signup
+  const validation = ({ email, password, cfpassword }) => {
+    const errors = {};
+    const userCurrent = utils.findUser(users, email);
+    const { email: userEmail } = userCurrent;
 
-    if (email !== undefined || password !== undefined) {
-        if (!email) {
-            errors.errEmail = 'Email is required!';
-        } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email)) {
-            errors.errEmail = 'Invalid email address!';
-        } else if (userEmail) {
-            errors.errEmail = 'Email exists already!';
-        } else {
-            errors.errEmail = false;
-        } if (!password) {
-            errors.errPassword = 'Password is required!';
-        } else if (password.length < 6) {
-            errors.errPassword = 'Password need minimum is 6 character!';
-        } else {
-            errors.errPassword = false;
-        } if (!cfpassword) {
-            errors.errCfPassword = 'Your need confirm password!';
-        } else if (cfpassword !== password) {
-            errors.errCfPassword = 'Wrong password!';
-        } else {
-            errors.errCfPassword = false;
-        }
-    };
+    if (!email) {
+      errors.email = 'Email is required';
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email)) {
+      errors.email = 'Invalid email address';
+    } else if (userEmail) {
+      errors.email = 'Email exists already';
+    }
+    if (!password) {
+      errors.password = 'Password is required';
+    } else if (password.length < 6) {
+      errors.password = 'Password need minimum is 6 character!';
+    }
+    if (!cfpassword) {
+      errors.cfpassword = 'Your need confirm password!';
+    } else if (!errors.password && cfpassword !== password) {
+      errors.cfpassword = 'Wrong password!';
+    }
+    return errors;
+  };
 
+  const handleSubmit = async ({ email, password }) => {
+    try {
+      const { data, status } = await postUser({
+        email,
+        password: md5(password),
+      });
+      if (status === types.STATUS_CODE.CREATED) {
+        dispatch(signUp(data));
+        history.push('/signin');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-    const onSubmit = async event => {
-        let { email, password } = userInfo;
-        event.preventDefault();
-        try {
-            password = md5(password);
-            const res = await postUser({ email, password });
-            if (res.status === types.STATUS_CODE.CREATED) {
-                history.push('/signin');
-            };
-        } catch (error) {
-            console.log(error);
-        };
-    };
+  const handleTogglePassword = (inputName) => {
+    let values = [...showPasswordField];
+    if (values.includes(inputName)) {
+      setShowPasswordField([..._.filter(values, (item) => item !== inputName)]);
+    } else {
+      setShowPasswordField([...values, inputName]);
+    }
+  };
 
-    useEffect(() => {
-        textInput.current.focus();
-    }, []);
-
-    const { errEmail, errPassword, errCfPassword } = errors;
-    return (
-        <Container className="container mt-5">
-            <Row className="mt-5">
-                <Col sm="5" className="mx-auto">
-                    <Form className="form-auth">
-                        <div className="form-group">
-                            <Label htmlFor="email">Email address*</Label>
-                            <input
-                                onChange={handleChange}
-                                name="email"
-                                type="email"
-                                className="form-control"
-                                id="email"
-                                placeholder="Enter your email"
-                                autoComplete="off"
-                                ref={textInput}
-                            />
-                            {email !== undefined && errEmail && <span className="text-danger">{errEmail}</span>}
-                        </div>
-                        <div className="form-group">
-                            <Label htmlFor="password">Password*</Label>
-                            <Input
-                                onChange={handleChange}
-                                name="password"
-                                type="password"
-                                className="form-control"
-                                id="password"
-                                placeholder="Enter your password"
-                                autoComplete="off"
-                            />
-                            {password !== undefined && errPassword && <span className="text-danger">{errPassword}</span>}
-                        </div>
-                        <div className="form-group">
-                            <Label htmlFor="cfpassword">Confirm Password*</Label>
-                            <Input
-                                onChange={handleChange}
-                                name="cfpassword"
-                                type="password"
-                                className="form-control"
-                                id="cfpassword"
-                                placeholder="Enter your password"
-                                autoComplete="off"
-                            />
-                            {cfpassword !== undefined && errCfPassword && <span className="text-danger">{errCfPassword}</span>}
-                        </div>
-                        <Link to="/signin"><u className="form-text">I have already account!</u></Link>
-                        <Button
-                            onClick={onSubmit}
-                            type="submit" color="primary" className="mt-2 d-block"
-                            disabled={errEmail !== false || errPassword !== false || errCfPassword !== false}>Register
-                        </Button>
-                    </Form>
-                </Col>
-            </Row>
-        </Container>
-    );
-};
-
-SignUp.propTypes = {
-    users: PropTypes.array
-};
-
-export default SignUp;
+  return (
+    <Container className="container mt-5">
+      <Row className="mt-5">
+        <Col sm="5" className="mx-auto">
+          <Formik
+            initialValues={{
+              email: '',
+              password: '',
+              cfpassword: '',
+            }}
+            onSubmit={handleSubmit}
+            validate={validation}
+          >
+            {({ touched, errors, isValid }) => (
+              <Form className="form-auth" autoComplete="off">
+                <div className="form-group">
+                  <Label htmlFor="email">Your email*</Label>
+                  <Field name="email">
+                    {({ field }) => (
+                      <input
+                        id="email"
+                        type="email"
+                        className="form-control"
+                        placeholder="Enter your email"
+                        {...field}
+                      />
+                    )}
+                  </Field>
+                  {touched.email && errors.email && (
+                    <span
+                      style={{
+                        fontSize: '1.4rem',
+                        marginTop: '0.8rem',
+                        display: 'block',
+                      }}
+                      className="text-danger"
+                    >
+                      {errors.email}
+                    </span>
+                  )}
+                </div>
+                <div className="form-group">
+                  <Label htmlFor="password">Your password*</Label>
+                  <Field name="password">
+                    {({ field }) => (
+                      <input
+                        id="password"
+                        type={`${
+                          showPasswordField.includes('password')
+                            ? 'text'
+                            : 'password'
+                        }`}
+                        className="form-control"
+                        placeholder="Enter your password"
+                        {...field}
+                      />
+                    )}
+                  </Field>
+                  <i
+                    onClick={() => handleTogglePassword('password')}
+                    className="far fa-eye"
+                  />
+                  {touched.password && errors.password && (
+                    <span
+                      style={{
+                        fontSize: '1.4rem',
+                        marginTop: '0.8rem',
+                        display: 'block',
+                      }}
+                      className="text-danger"
+                    >
+                      {errors.password}
+                    </span>
+                  )}
+                </div>
+                <div className="form-group">
+                  <Label htmlFor="cfpassword">Your password*</Label>
+                  <Field name="cfpassword">
+                    {({ field }) => (
+                      <input
+                        id="cfpassword"
+                        type={`${
+                          showPasswordField.includes('cfpassword')
+                            ? 'text'
+                            : 'password'
+                        }`}
+                        className="form-control"
+                        placeholder="Enter password again"
+                        {...field}
+                      />
+                    )}
+                  </Field>
+                  <i
+                    onClick={() => handleTogglePassword('cfpassword')}
+                    className="far fa-eye"
+                  />
+                  {touched.cfpassword && errors.cfpassword && (
+                    <span
+                      style={{
+                        fontSize: '1.4rem',
+                        marginTop: '0.8rem',
+                        display: 'block',
+                      }}
+                      className="text-danger"
+                    >
+                      {errors.cfpassword}
+                    </span>
+                  )}
+                </div>
+                <Link to="/signin">
+                  <u className="form-text">I have already account</u>
+                </Link>
+                <Button
+                  type="submit"
+                  color="primary"
+                  className="d-block"
+                  disabled={!isValid}
+                >
+                  Signup
+                </Button>
+              </Form>
+            )}
+          </Formik>
+        </Col>
+      </Row>
+    </Container>
+  );
+}
