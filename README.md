@@ -10,7 +10,7 @@ Run the command below to start my application
 npm install
 ```
 
-## Authors
+## Author
 
 * **Nguyen Quang Tuyen**
 
