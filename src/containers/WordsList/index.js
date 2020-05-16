@@ -190,7 +190,7 @@ export default function WordsListContainer() {
           setTimeout(() => {
             handleHideLoading();
           }, 1000);
-          toast.error(`${name} successfully deleted!`, {
+          toast.error(`${name} deleted successfully!`, {
             position: toast.POSITION.BOTTOM_LEFT,
             autoClose: 2000,
             bodyClassName: css({
@@ -273,7 +273,7 @@ export default function WordsListContainer() {
           <div className="box-welcome d-flex align-items-center">
             <img className="loading-image" src={welComeGif} alt="Welcome Gif" />
             <h3 className="box-welcome-text">
-              Welcome. Please signin or sign up!
+              Welcome. Please sign in or sign up!
             </h3>
           </div>
         </div>

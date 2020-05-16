@@ -35,7 +35,7 @@ export default function RemoveModal({
       </ModalHeader>
       <ModalBody>
         <p className="modal-content modal-content-body">
-          Are you sure remove:
+          Are you sure you want to delete:
           <b> {name}?</b>
         </p>
       </ModalBody>
